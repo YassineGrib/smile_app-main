@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import '../utils/app_theme.dart';
-import '../utils/app_constants.dart';
 import '../widgets/custom_text_field.dart';
+import '../services/demo_data_service.dart';
+import 'package:flutter/services.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -143,6 +146,34 @@ class _PaymentScreenState extends State<PaymentScreen>
     });
   }
 
+  void _fillDemoData() async {
+    final demoData = DemoDataService.generatePaymentData();
+    PlatformFile? demoScreenshot;
+    try {
+      // Load asset as bytes
+      final byteData = await rootBundle.load('assets/images/logo.png');
+      // Get temp directory
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File('${tempDir.path}/demo_payment_logo.png');
+      await tempFile.writeAsBytes(byteData.buffer.asUint8List());
+      demoScreenshot = PlatformFile(
+        name: 'demo_payment_logo.png',
+        path: tempFile.path,
+        size: byteData.lengthInBytes,
+        bytes: byteData.buffer.asUint8List(),
+      );
+    } catch (e) {
+      demoScreenshot = null;
+    }
+    setState(() {
+      _selectedPaymentMethod = demoData['paymentMethod'];
+      _accountNumberController.text = demoData['accountNumber'];
+      _accountHolderController.text = demoData['accountHolder'];
+      _paymentScreenshot = demoScreenshot;
+    });
+    _showSuccessSnackBar('Demo payment data filled!');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,6 +183,13 @@ class _PaymentScreenState extends State<PaymentScreen>
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/registration/plan-selection'),
         ),
+        actions: [
+          IconButton(
+            onPressed: _fillDemoData,
+            icon: const Icon(Icons.auto_fix_high),
+            tooltip: 'Fill Demo Data',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),

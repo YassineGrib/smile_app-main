@@ -21,7 +21,7 @@ class _VideoWelcomeScreenState extends State<VideoWelcomeScreen>
   late Animation<Offset> _slideAnimation;
   
   bool _isVideoInitialized = false;
-  bool _showControls = false;
+  final bool _showControls = false;
 
   @override
   void initState() {

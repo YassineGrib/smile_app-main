@@ -22,6 +22,7 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
   
   String? _selectedTimePeriod;
   bool _isLoading = false;
+  int? _childAgeInMonths;
 
   @override
   void dispose() {
@@ -30,6 +31,16 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
     _emailController.dispose();
     _addressController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final uri = Uri.parse(GoRouterState.of(context).uri.toString());
+    final ageParam = uri.queryParameters['ageInMonths'];
+    if (ageParam != null) {
+      _childAgeInMonths = int.tryParse(ageParam);
+    }
   }
 
   void _showPricingAlert(String timePeriod) {
@@ -142,7 +153,11 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
       });
       
       // Navigate to plan selection screen
-      context.go('/registration/plan-selection');
+      if (_childAgeInMonths != null) {
+        context.go('/registration/plan-selection?ageInMonths=$_childAgeInMonths');
+      } else {
+        context.go('/registration/plan-selection');
+      }
     });
   }
 
@@ -377,7 +392,7 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
                     ),
                   ),
                 );
-              }).toList(),
+              }),
               
               const SizedBox(height: AppSpacing.xl),
               

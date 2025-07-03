@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../utils/app_theme.dart';
-import '../utils/app_constants.dart';
 
 class PlanSelectionScreen extends StatefulWidget {
   const PlanSelectionScreen({super.key});
@@ -26,6 +25,21 @@ class _PlanSelectionScreenState extends State<PlanSelectionScreen>
   void initState() {
     super.initState();
     _initializeAnimations();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final uri = Uri.parse(GoRouterState.of(context).uri.toString());
+    final ageParam = uri.queryParameters['ageInMonths'];
+    if (ageParam != null) {
+      final parsed = int.tryParse(ageParam);
+      if (parsed != null) {
+        setState(() {
+          childAgeInMonths = parsed;
+        });
+      }
+    }
   }
 
   void _initializeAnimations() {

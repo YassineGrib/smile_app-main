@@ -200,7 +200,7 @@ class _HealthConditionSelectorState extends State<HealthConditionSelector> {
                     ),
                   ),
                 );
-              }).toList(),
+              }),
               
               // Other condition text field
               if (_showOtherField) ...[

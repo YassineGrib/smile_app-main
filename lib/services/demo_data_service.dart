@@ -174,6 +174,20 @@ class DemoDataService {
     };
   }
 
+  /// Generate demo data for payment information
+  static Map<String, dynamic> generatePaymentData() {
+    // Use only the methods available in the UI
+    final paymentMethods = ['ccp', 'baridimob'];
+    final paymentMethod = paymentMethods[_random.nextInt(paymentMethods.length)];
+    final accountNumber = paymentMethod == 'ccp' ? '0012345678' : '0551234567';
+    final accountHolder = 'Demo User';
+    return {
+      'paymentMethod': paymentMethod,
+      'accountNumber': accountNumber,
+      'accountHolder': accountHolder,
+    };
+  }
+
   /// Generate complete demo registration data
   static Map<String, dynamic> generateCompleteRegistrationData() {
     return {

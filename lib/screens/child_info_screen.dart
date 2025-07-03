@@ -193,7 +193,7 @@ class _ChildInfoScreenState extends State<ChildInfoScreen> {
     // Show a confirmation dialog before filling
     final demoData = DemoDataService.generateChildInfo();
 
-    _nameController.text = demoData['childName'];
+    _nameController.text = demoData['fullName'];
     setState(() {
       _selectedDate = demoData['birthDate'];
       _selectedGender = demoData['gender'];
@@ -220,6 +220,13 @@ class _ChildInfoScreenState extends State<ChildInfoScreen> {
       return;
     }
 
+    // Calculate age in months
+    final now = DateTime.now();
+    int ageInMonths = (now.year - _selectedDate!.year) * 12 + (now.month - _selectedDate!.month);
+    if (now.day < _selectedDate!.day) {
+      ageInMonths--;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -230,8 +237,8 @@ class _ChildInfoScreenState extends State<ChildInfoScreen> {
         _isLoading = false;
       });
 
-      // Navigate to parent info screen
-      context.go('/registration/parent-info');
+      // Navigate to parent info screen, passing ageInMonths
+      context.go('/registration/parent-info?ageInMonths=$ageInMonths');
     });
   }
 

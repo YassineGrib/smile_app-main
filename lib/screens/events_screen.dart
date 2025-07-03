@@ -4,7 +4,6 @@ import 'package:smile_app/services/demo_data_service.dart';
 import 'package:smile_app/widgets/event_card.dart';
 import '../models/event_model.dart';
 import '../utils/app_theme.dart';
-import '../utils/app_constants.dart';
 
 class EventsScreen extends StatelessWidget {
   const EventsScreen({super.key});
