@@ -20,9 +20,10 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
   final _emailController = TextEditingController();
   final _addressController = TextEditingController();
   
-  String? _selectedTimePeriod;
   bool _isLoading = false;
   int? _childAgeInMonths;
+  String? _childName;
+  String? _childGender;
 
   @override
   void dispose() {
@@ -36,61 +37,36 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final uri = Uri.parse(GoRouterState.of(context).uri.toString());
-    final ageParam = uri.queryParameters['ageInMonths'];
-    if (ageParam != null) {
-      _childAgeInMonths = int.tryParse(ageParam);
+    try {
+      final uri = Uri.parse(GoRouterState.of(context).uri.toString());
+      final ageParam = uri.queryParameters['ageInMonths'];
+      final nameParam = uri.queryParameters['childName'];
+      final genderParam = uri.queryParameters['childGender'];
+      
+      if (ageParam != null) {
+        _childAgeInMonths = int.tryParse(ageParam);
+      }
+      if (nameParam != null) {
+        try {
+          _childName = Uri.decodeComponent(nameParam);
+        } catch (e) {
+          _childName = nameParam; // Use original if decoding fails
+        }
+      }
+      if (genderParam != null) {
+        try {
+          _childGender = Uri.decodeComponent(genderParam);
+        } catch (e) {
+          _childGender = genderParam; // Use original if decoding fails
+        }
+      }
+    } catch (e) {
+      // Handle URI parsing errors gracefully
+      print('Error parsing URI parameters: $e');
     }
   }
 
-  void _showPricingAlert(String timePeriod) {
-    String message = '';
-    String title = '';
-    Color alertColor = AppTheme.infoColor;
-    
-    switch (timePeriod) {
-      case 'full_day':
-        title = 'Full Day Pricing';
-        message = 'Full day care (08:00 - 17:00) has higher pricing than individual periods. You\'ll see the exact pricing in the next step.';
-        alertColor = AppTheme.warningColor;
-        break;
-      case 'morning':
-        title = 'Morning Period';
-        message = 'Morning period (08:00 - 12:00) - Perfect for working parents who need early care.';
-        break;
-      case 'evening':
-        title = 'Evening Period';
-        message = 'Evening period (13:00 - 17:00) - Great for afternoon activities and care.';
-        break;
-    }
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppBorderRadius.lg),
-        ),
-        title: Row(
-          children: [
-            Icon(
-              Icons.access_time,
-              color: alertColor,
-              size: 24,
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Text(title),
-          ],
-        ),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Got it'),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _fillDemoData() {
     final demoData = DemoDataService.generateParentData();
@@ -100,7 +76,7 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
       _phoneController.text = demoData['phoneNumber'];
       _emailController.text = demoData['email'];
       _addressController.text = demoData['address'];
-      _selectedTimePeriod = demoData['timePeriod'];
+
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -112,15 +88,7 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
     );
   }
 
-  void _onTimePeriodChanged(String? value) {
-    setState(() {
-      _selectedTimePeriod = value;
-    });
 
-    if (value != null) {
-      _showPricingAlert(value);
-    }
-  }
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -137,10 +105,7 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
       return;
     }
 
-    if (_selectedTimePeriod == null) {
-      _showErrorSnackBar('Please select a time period');
-      return;
-    }
+
 
     setState(() {
       _isLoading = true;
@@ -152,9 +117,11 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
         _isLoading = false;
       });
       
-      // Navigate to plan selection screen
-      if (_childAgeInMonths != null) {
-        context.go('/registration/plan-selection?ageInMonths=$_childAgeInMonths');
+      // Navigate to plan selection screen with all child info
+      if (_childAgeInMonths != null && _childName != null && _childGender != null) {
+        final childName = Uri.encodeComponent(_childName!);
+        final childGender = Uri.encodeComponent(_childGender!);
+        context.go('/registration/plan-selection?ageInMonths=$_childAgeInMonths&childName=$childName&childGender=$childGender');
       } else {
         context.go('/registration/plan-selection');
       }
@@ -254,146 +221,6 @@ class _ParentInfoScreenState extends State<ParentInfoScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: AppSpacing.xl),
-              
-              // Time Period Selection
-              Text(
-                'Preferred Time Period',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppTheme.textPrimaryColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Choose the time period that works best for your schedule',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondaryColor,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              
-              // Time Period Cards
-              ...AppConstants.timePeriods.map((period) {
-                final isSelected = _selectedTimePeriod == period['id'];
-                
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: InkWell(
-                    onTap: () => _onTimePeriodChanged(period['id']),
-                    borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      decoration: BoxDecoration(
-                        color: isSelected 
-                            ? AppTheme.primaryColor.withOpacity(0.1)
-                            : AppTheme.cardColor,
-                        borderRadius: BorderRadius.circular(AppBorderRadius.md),
-                        border: Border.all(
-                          color: isSelected 
-                              ? AppTheme.primaryColor
-                              : AppTheme.textLightColor.withOpacity(0.3),
-                          width: isSelected ? 2 : 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Radio button
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: isSelected 
-                                  ? AppTheme.primaryColor
-                                  : Colors.transparent,
-                              border: Border.all(
-                                color: isSelected 
-                                    ? AppTheme.primaryColor
-                                    : AppTheme.textLightColor,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(AppBorderRadius.round),
-                            ),
-                            child: isSelected
-                                ? const Icon(
-                                    Icons.check,
-                                    size: 12,
-                                    color: Colors.white,
-                                  )
-                                : null,
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          
-                          // Time icon
-                          Icon(
-                            Icons.access_time,
-                            color: isSelected 
-                                ? AppTheme.primaryColor
-                                : AppTheme.textSecondaryColor,
-                            size: 24,
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          
-                          // Period details
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  period['name'],
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: isSelected 
-                                        ? AppTheme.primaryColor
-                                        : AppTheme.textPrimaryColor,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  period['time'],
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: AppTheme.textSecondaryColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  period['description'],
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.textSecondaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          
-                          // Special indicator for full day
-                          if (period['id'] == 'full_day')
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.sm,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppTheme.warningColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(AppBorderRadius.sm),
-                              ),
-                              child: Text(
-                                'Higher Price',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppTheme.warningColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }),
-              
               const SizedBox(height: AppSpacing.xl),
               
               // Contact Information Notice

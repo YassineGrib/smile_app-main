@@ -108,15 +108,43 @@ class _ChatScreenState extends State<ChatScreen> {
     final message = userMessage.toLowerCase();
     
     if (message.contains('price') || message.contains('cost') || message.contains('fee')) {
-      return 'Our pricing is:\n• Basic Plan: ${AppConstants.basicPlanPrice} DA/month\n• Premium Plan: ${AppConstants.premiumPlanPrice} DA/month\n\nWould you like to know more about what\'s included in each plan?';
+      return '''Our pricing varies by age group and schedule:
+
+**3 months to 2 years:**
+• Morning (8:00 AM - 12:00 PM): ${AppConstants.monthlyMorningPrice3m2y} DA/month
+• Evening (1:00 PM - 5:00 PM): ${AppConstants.monthlyEveningPrice3m2y} DA/month
+• Night (5:00 PM - 8:00 AM): ${AppConstants.monthlyNightPrice3m2y} DA/month
+• Full Day (8:00 AM - 5:00 PM): ${AppConstants.monthlyFullDayPrice3m2y} DA/month
+
+**2 years to 5 years:**
+• Morning (8:00 AM - 12:00 PM): ${AppConstants.monthlyMorningPrice2y5y} DA/month
+• Evening (1:00 PM - 5:00 PM): ${AppConstants.monthlyEveningPrice2y5y} DA/month
+• Night (5:00 PM - 8:00 AM): ${AppConstants.monthlyNightPrice2y5y} DA/month
+• Full Day (8:00 AM - 5:00 PM): ${AppConstants.monthlyFullDayPrice2y5y} DA/month
+
+We also offer daily rates. Would you like to know more about our programs?''';
     } else if (message.contains('hours') || message.contains('time') || message.contains('schedule')) {
-      return 'We offer flexible schedules:\n• Morning: 7:00 AM - 12:00 PM\n• Evening: 1:00 PM - 6:00 PM\n• Full Day: 7:00 AM - 6:00 PM\n\nWhich schedule works best for your family?';
+      return '''We offer flexible schedules:
+
+**Morning Period:** 8:00 AM - 12:00 PM
+**Evening Period:** 1:00 PM - 5:00 PM  
+**Full Day:** 8:00 AM - 5:00 PM
+**Night Period:** 5:00 PM - 8:00 AM
+
+Which schedule works best for your family?''';
     } else if (message.contains('age') || message.contains('old')) {
-      return 'We accept children from 6 months to 5 years old. Our programs are designed for different age groups to ensure appropriate care and activities for each child.';
+      return 'We accept children from 3 months to 5 years old. Our programs are designed for different age groups to ensure appropriate care and activities for each child.';
     } else if (message.contains('visit') || message.contains('tour')) {
       return 'We\'d love to show you our facilities! You can book a visit through our app or call us directly. Would you like me to help you schedule a visit?';
     } else if (message.contains('food') || message.contains('meal') || message.contains('lunch')) {
-      return 'We provide nutritious meals:\n• Basic Plan: Lunch included\n• Premium Plan: 3 meals (breakfast, lunch, snack)\n\nAll meals are prepared fresh daily with healthy, child-friendly ingredients.';
+      return '''We provide nutritious meals:
+
+**Morning Care:** Healthy breakfast included
+**Evening Care:** Healthy lunch included
+**Full Day Care:** 3 healthy meals (breakfast, lunch, snack)
+**Night Care:** Dinner and breakfast included
+
+All meals are prepared fresh daily with healthy, child-friendly ingredients.''';
     } else if (message.contains('safety') || message.contains('security')) {
       return 'Safety is our top priority! We have:\n• 24/7 security cameras\n• Trained staff with first aid certification\n• Secure entry/exit system\n• Regular safety drills\n• Child-proofed environment';
     } else if (message.contains('staff') || message.contains('teacher')) {

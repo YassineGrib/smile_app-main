@@ -237,8 +237,10 @@ class _ChildInfoScreenState extends State<ChildInfoScreen> {
         _isLoading = false;
       });
 
-      // Navigate to parent info screen, passing ageInMonths
-      context.go('/registration/parent-info?ageInMonths=$ageInMonths');
+      // Navigate to parent info screen, passing all child info
+      final childName = Uri.encodeComponent(_nameController.text.trim());
+      final childGender = Uri.encodeComponent(_selectedGender!);
+      context.go('/registration/parent-info?ageInMonths=$ageInMonths&childName=$childName&childGender=$childGender');
     });
   }
 

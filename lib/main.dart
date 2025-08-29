@@ -20,6 +20,7 @@ import 'screens/admin_children_screen.dart';
 import 'screens/admin_parents_screen.dart';
 import 'screens/admin_visits_screen.dart';
 import 'screens/admin_messages_screen.dart';
+import 'screens/admin_settings_screen.dart';
 
 void main() {
   runApp(const SmileNurseryApp());
@@ -68,12 +69,29 @@ final GoRouter _router = GoRouter(
 
     GoRoute(
       path: '/registration/plan-selection',
-      builder: (context, state) => const PlanSelectionScreen(),
+      builder: (context, state) {
+        final uri = Uri.parse(state.uri.toString());
+        final ageInMonths = int.tryParse(uri.queryParameters['ageInMonths'] ?? '18') ?? 18;
+        final childName = uri.queryParameters['childName'] ?? 'Test Child';
+        final childGender = uri.queryParameters['childGender'] ?? 'male';
+        
+        return PlanSelectionScreen(
+          childName: childName,
+          childAgeInMonths: ageInMonths,
+          childGender: childGender,
+        );
+      },
     ),
 
     GoRoute(
       path: '/registration/payment',
-      builder: (context, state) => const PaymentScreen(),
+      builder: (context, state) => const PaymentScreen(
+        childName: 'Test Child',
+        childAge: 18,
+        planType: 'Day Care',
+        planPrice: 500,
+        isMonthly: false,
+      ),
     ),
 
     GoRoute(
@@ -130,6 +148,11 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/admin/messages',
       builder: (context, state) => const AdminMessagesScreen(),
+    ),
+
+    GoRoute(
+      path: '/admin/settings',
+      builder: (context, state) => const AdminSettingsScreen(),
     ),
   ],
 );

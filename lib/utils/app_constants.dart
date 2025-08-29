@@ -12,14 +12,42 @@ class AppConstants {
   static const String nurseryCCP = '1234567890';
   
   // Working Hours
-  static const String morningShift = '08:00 - 12:00';
-  static const String eveningShift = '13:00 - 17:00';
-  static const String fullDay = '08:00 - 17:00';
+  static const String morningShift = '07:30 - 14:30';
+  static const String eveningShift = '14:30 - 21:30';
+  static const String fullDay = '07:30- 21:30';
+  static const String nightShift = '21:30 - 07:30';
   
-  // Pricing (in DZD)
-  static const int basicPlanPrice = 6000;
-  static const int premiumPlanPrice = 10000;
+  // Pricing Structure (in DZD)
   static const String currency = 'DA';
+  
+  // Monthly Pricing (3 months to 2 years)
+  static const int monthlyMorningPrice3m2y = 7000;  // نهار
+  static const int monthlyEveningPrice3m2y = 7000; // مساء - لن يستخدم في الاشتراك الشهري
+  static const int monthlyFullDayPrice3m2y = 10000; // يوم كامل (صباح مساء ليل)
+  static const int monthlyNightPrice3m2y = 3000;   // ليل
+  
+  // Monthly Pricing (2 years to 5 years)
+  static const int monthlyMorningPrice2y5y = 5000;  // نهار
+  static const int monthlyEveningPrice2y5y = 5000; // مساء - لن يستخدم في الاشتراك الشهري
+  static const int monthlyFullDayPrice2y5y = 8000;  // يوم كامل (صباح مساء ليل)
+  static const int monthlyNightPrice2y5y = 3000;   // ليل
+  
+  // Daily Pricing (3 months to 2 years)
+  static const int dailyMorningPrice3m2y = 500;    // صباح
+  static const int dailyEveningPrice3m2y = 500;   // مساء
+  static const int dailyFullDayPrice3m2y = 800;   // يوم كامل
+  static const int dailyNightPrice3m2y = 600;     // ليل
+  
+  // Daily Pricing (2 years to 5 years)
+  static const int dailyMorningPrice2y5y = 500;   // صباح
+  static const int dailyEveningPrice2y5y = 500;   // مساء
+  static const int dailyFullDayPrice2y5y = 800;   // يوم كامل
+  static const int dailyNightPrice2y5y = 600;     // ليل
+  
+  // Age Groups
+  static const int minAgeMonths = 3;
+  static const int maxAgeMonths = 60; // 5 years
+  static const int twoYearsMonths = 24;
   
   // Plan Features
   static const List<String> basicPlanFeatures = [
@@ -56,7 +84,13 @@ class AppConstants {
       'id': 'full_day',
       'name': 'Full Day',
       'time': fullDay,
-      'description': 'Complete day care (higher price)',
+      'description': 'Complete day care',
+    },
+    {
+      'id': 'night',
+      'name': 'Night Period',
+      'time': nightShift,
+      'description': 'Overnight care',
     },
   ];
   
@@ -159,6 +193,7 @@ enum TimePeriod {
   morning,
   evening,
   fullDay,
+  night,
 }
 
 enum PlanType {
@@ -187,4 +222,14 @@ enum MessageType {
 enum UserType {
   parent,
   admin,
+}
+
+enum AgeGroup {
+  threeMonthsToTwoYears,
+  twoYearsToFiveYears,
+}
+
+enum BillingType {
+  daily,
+  monthly,
 }

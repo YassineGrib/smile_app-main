@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import '../utils/app_theme.dart';
+import '../utils/app_constants.dart';
 import '../widgets/custom_text_field.dart';
 import '../services/demo_data_service.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +10,20 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+  final String childName;
+  final int childAge;
+  final String planType;
+  final int planPrice;
+  final bool isMonthly;
+
+  const PaymentScreen({
+    super.key,
+    required this.childName,
+    required this.childAge,
+    required this.planType,
+    required this.planPrice,
+    required this.isMonthly,
+  });
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
@@ -25,6 +39,12 @@ class _PaymentScreenState extends State<PaymentScreen>
   PlatformFile? _paymentScreenshot;
   bool _isLoading = false;
   
+  // Plan details from previous screen
+  late String _selectedPlan;
+  late String _selectedDuration;
+  late int _price;
+  late int _childAgeInMonths;
+  
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -32,7 +52,19 @@ class _PaymentScreenState extends State<PaymentScreen>
   @override
   void initState() {
     super.initState();
+    
+    // Initialize plan details from widget
+    _selectedPlan = widget.planType;
+    _selectedDuration = widget.isMonthly ? 'monthly' : 'daily';
+    _price = widget.planPrice;
+    _childAgeInMonths = widget.childAge;
+    
     _initializeAnimations();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   void _initializeAnimations() {
@@ -66,6 +98,44 @@ class _PaymentScreenState extends State<PaymentScreen>
     _accountNumberController.dispose();
     _accountHolderController.dispose();
     super.dispose();
+  }
+
+  String _getPlanName() {
+    switch (_selectedPlan) {
+      case 'morning':
+        return 'Morning Care';
+      case 'evening':
+        return 'Evening Care';
+      case 'night':
+        return 'Night Care';
+      case 'fullDay':
+        return 'Full Day Care';
+      default:
+        return 'Selected Plan';
+    }
+  }
+
+  String _getDurationText() {
+    switch (_selectedDuration) {
+      case 'daily':
+        return '/ Day';
+      case 'monthly':
+      default:
+        return '/ Month';
+    }
+  }
+
+  String _getAgeGroup() {
+    if (_childAgeInMonths == null) return '';
+    
+    final isYoungerGroup = _childAgeInMonths! >= AppConstants.minAgeMonths && 
+                          _childAgeInMonths! < AppConstants.twoYearsMonths;
+    
+    if (isYoungerGroup) {
+      return '3 months to 2 years';
+    } else {
+      return '2 years to 5 years';
+    }
   }
 
   void _onPaymentMethodChanged(String? method) {
@@ -230,6 +300,85 @@ class _PaymentScreenState extends State<PaymentScreen>
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
+              
+              // Plan Summary
+              if (_selectedPlan != null && _price != null) ...[
+                SlideTransition(
+                  position: _slideAnimation,
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(AppBorderRadius.lg),
+                        border: Border.all(
+                          color: AppTheme.primaryColor.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.summarize,
+                                color: AppTheme.primaryColor,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                'Plan Summary',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _getPlanName(),
+                                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Text(
+                                    '${_price} ${AppConstants.currency}${_getDurationText()}',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      color: AppTheme.primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (_childAgeInMonths != null) ...[
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  'Age Group: ${_getAgeGroup()}',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppTheme.textSecondaryColor,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+              ],
               
               // Payment Methods
               SlideTransition(
