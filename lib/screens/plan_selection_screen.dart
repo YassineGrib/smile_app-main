@@ -451,7 +451,7 @@ class _PlanSelectionScreenState extends State<PlanSelectionScreen> {
                       ),
                     ),
                     child: const Text(
-                      'حسناً',
+                      'OK',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -496,9 +496,14 @@ class _PlanSelectionScreenState extends State<PlanSelectionScreen> {
           return [
             'Sensory play (colors, sounds, textures)',
             'Songs and Rhymes in multiple languages',
+            'Breakfast and rest time',
             'Fine motor play (blocks, shape sorting)',
             'Picture Books about family and health',
-            'Breakfast and rest time'
+            'Simple musical activities (Snack and wind-down)',
+            
+            'Safe quiet sleep environment',
+            'Soothing lullabies',
+            'Consistent bedtime routine'
           ];
         default:
           return [];
@@ -511,7 +516,11 @@ class _PlanSelectionScreenState extends State<PlanSelectionScreen> {
             'Educational activities (colors, numbers, body parts)',
             'Little helpers workshop (medical tools intro)',
             'Group games (Building, cooperation)',
-            'Breakfast and outdoor play'
+            'Breakfast and outdoor play',
+            'Role play (Doctors and Nurses)',
+            'Art activities (coloring and drawing)',
+            'Educational games (matching tools to names)',
+            'Snack and Relaxation'
           ];
         case 'evening':
           return [
@@ -530,9 +539,15 @@ class _PlanSelectionScreenState extends State<PlanSelectionScreen> {
           return [
             'Educational activities (colors, numbers, body parts)',
             'Little helpers workshop (medical tools intro)',
+            'Group games (Building, cooperation)',
+            'Breakfast and outdoor play',
             'Role play (Doctors and Nurses)',
             'Art activities (coloring and drawing)',
-            'Breakfast and outdoor play'
+            'Educational games (matching tools to names)',
+            'Snack and Relaxation',
+             'Storytime before bed',
+            'Relaxation activities (simple breathing exercises)',
+            'Structured bedtime routine'
           ];
         default:
           return [];
